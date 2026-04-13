@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Sürpriz</title>
+<style>
+body { margin:0; overflow:hidden; font-family: Arial; background:#0b0b0b; }
+
+.heart { position: fixed; bottom:-20px; width:15px; height:15px; background:red; transform:rotate(45deg); animation:float 6s linear infinite; }
+.heart::before,.heart::after { content:""; position:absolute; width:15px; height:15px; background:red; border-radius:50%; }
+.heart::before { top:-7px; }
+.heart::after { left:-7px; }
+@keyframes float { 0%{opacity:1;} 100%{transform:translateY(-100vh) rotate(45deg); opacity:0;} }
+
+.container {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:90%; max-width:420px; padding:25px; border-radius:20px;
+  background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+  text-align:center; color:white;
+}
+
+img { width:100%; border-radius:10px; margin-top:10px; opacity:0; transition:0.5s; }
+.show { opacity:1; }
+
+button { margin:10px; padding:12px 18px; border:none; border-radius:10px; cursor:pointer; font-size:16px; position:relative; }
+.btn-yes { background:#4caf50; color:white; }
+.btn-no { background:#f44336; color:white; }
+
+.loader {
+  width:100%; background:#333; border-radius:10px; overflow:hidden; margin-top:15px;
+}
+.bar {
+  width:0%; height:10px; background:#4caf50; transition: width 2s linear;
+}
+
+.aslanText {
+  font-size: 20px;
+  opacity: 0;
+  transform: scale(0.5);
+  animation: growText 1.2s ease forwards;
+}
+
+@keyframes growText {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// kalpler
+setInterval(()=>{
+ const h=document.createElement('div');
+ h.className='heart';
+ h.style.left=Math.random()*100+'vw';
+ document.body.appendChild(h);
+ setTimeout(()=>h.remove(),6000);
+},300);
+
+const app=document.getElementById('app');
+
+function renderStep(text, gif, buttons, loadingText, callback){
+  app.innerHTML = `
+    <h2>${text}</h2>
+    <div class="loader"><div class="bar" id="bar"></div></div>
+    <p id="loadText">${loadingText}</p>
+  `;
+
+  setTimeout(()=>{
+    document.getElementById('bar').style.width='100%';
+  },50);
+
+  setTimeout(()=>{
+    app.innerHTML = `<h2>${text}</h2><img id="gif" src="${gif}">`;
+
+    setTimeout(()=>{
+      document.getElementById('gif').classList.add('show');
+    },200);
+
+    setTimeout(()=>{
+      app.innerHTML += `<div>${buttons}</div>`;
+      if(callback) callback();
+    },600);
+
+  },2000);
+}
+
+function escape(){
+ const b=document.getElementById('escapeBtn');
+ if(!b) return;
+ b.onmouseover=()=>{
+  b.style.position='absolute';
+  b.style.top=Math.random()*80+'%';
+  b.style.left=Math.random()*80+'%';
+ };
+}
+
+// başlangıç
+renderStep("Günün nasıl geçti?","sorgu.gif",
+`<button class='btn-yes' onclick='goodDay()'>Güzeldi</button>
+<button class='btn-no' onclick='badDay()'>Güzel değildi</button>`,
+"Analiz ediliyor...");
+
+function badDay(){
+ renderStep("Hiç sorun değil 😌","havalı.gif",
+ `<p>Gününü güzelleştireyim mi minik bir oyunla?</p>
+ <button class='btn-yes' onclick='startGame()'>Evet</button>
+ <button class='btn-no' id='escapeBtn'>Hayır</button>`,
+ "Gün güzelleştirme planı hazırlanıyor...", escape);
+}
+
+function goodDay(){
+ renderStep("Harika 😍","happy.gif",
+ `<p>Hadi gel küçük bi oyun oynayalım daha da güzelleşsin!</p>
+ <button class='btn-yes' onclick='startGame()'>Varım</button>
+ <button class='btn-no' id='escapeBtn'>Yokum</button>`,
+ "Eğlence seviyesi artırılıyor...", escape);
+}
+
+function startGame(){
+ renderStep("Aklından bir burç tut 🔮","oyun.gif",
+ `<button class='btn-yes' onclick='q1()'>Hazırım</button>`,
+ "Zihin okunuyor...");
+}
+
+function q1(){
+ app.innerHTML=`<h2>İnsanların dikkatini çektiğini hisseder misin?</h2>
+ <button class='btn-yes' onclick='q2()'>Evet</button>
+ <button class='btn-no' onclick='q2()'>Hayır</button>`;
+}
+
+function q2(){
+ app.innerHTML=`<h2>Liderlik sana doğal mı geliyor?</h2>
+ <button class='btn-yes' onclick='q3()'>Evet</button>
+ <button class='btn-no' onclick='q3()'>Hayır</button>`;
+}
+
+function q3(){
+ app.innerHTML=`<h2>İltifat hoşuna gider mi?</h2>
+ <button class='btn-yes' onclick='result()'>Evet</button>
+ <button class='btn-no' onclick='result()'>Hayır</button>`;
+}
+
+function heartExplosion(){
+ for(let i=0;i<40;i++){
+  const h=document.createElement('div');
+  h.className='heart';
+  h.style.left='50%';
+  h.style.bottom='50%';
+  h.style.position='fixed';
+  h.style.transform=`translate(${Math.random()*200-100}px, ${Math.random()*200-100}px) rotate(45deg)`;
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),2000);
+ }
+}
+
+function result(){
+ app.innerHTML=`<h2>%30...</h2>`;
+ setTimeout(()=>{app.innerHTML=`<h2>%70...</h2>`;},800);
+ setTimeout(()=>{
+ app.innerHTML=`
+ <h2>%90 eminim 😏</h2>
+ <h1 class='aslanText'>ASLAN 🦁🔥</h1>
+ <p>Bu kadar çekicilik başka burçta yok zaten ✨</p>
+ <button onclick='revealMe()'>Benim burcumu merak ettin mi?</button>`;
+ heartExplosion();
+ },1600);
+}
+
+function revealMe(){
+ heartExplosion();
+ app.innerHTML=`
+ <h2>😏</h2>
+ <img src="havalıkedi.gif">
+ <h1>Aslanın eşi de aslandır 🦁</h1>
+ <button onclick='startGame()'>Tekrar</button>`;
+}
+
+</script>
+
+</body>
+</html>
